@@ -24,9 +24,22 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         this.InitializeComponent();
+
+        (this.Content as FrameworkElement).Loaded += MainWindow_Loaded;
     }
 
-    private void KeepAwakeToggle_Toggled(object sender, RoutedEventArgs e)
+    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        await _viewModel.InitializeAsync();
+
+        KeepAwakeToggle.IsOn = _viewModel.Settings.KeepComputerAwake;
+
+        StatusText.Text = _viewModel.Settings.KeepComputerAwake
+            ? "Keep Awake: ON"
+            : "Keep Awake: OFF";
+    }
+
+    private async void KeepAwakeToggle_Toggled(object sender, RoutedEventArgs e)
     {
         _viewModel.Settings.KeepComputerAwake = KeepAwakeToggle.IsOn;
 
@@ -35,5 +48,7 @@ public sealed partial class MainWindow : Window
         StatusText.Text = KeepAwakeToggle.IsOn
             ? "Keep Awake: ON"
             : "Keep Awake: OFF";
+
+        await _viewModel.SaveAsync();
     }
 }

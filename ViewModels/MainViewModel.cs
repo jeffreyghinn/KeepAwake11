@@ -5,34 +5,38 @@ namespace KeepAwake11.ViewModels;
 
 public class MainViewModel
 {
-	private readonly KeepAwakeService _keepAwakeService;
-	private readonly SettingsService _settingsService;
+    private readonly KeepAwakeService _keepAwakeService = new();
+    private readonly SettingsService _settingsService = new();
 
-	public AppSettings Settings { get; }
+    public AppSettings Settings { get; private set; } = new();
 
-	public MainViewModel()
-	{
-		_keepAwakeService = new KeepAwakeService();
-		_settingsService = new SettingsService();
+    public async Task InitializeAsync()
+    {
+        Settings = await _settingsService.LoadAsync();
 
-		Settings = new AppSettings();
-	}
+        ApplySettings();
+    }
 
-	public void ApplySettings()
-	{
-		if (!Settings.KeepComputerAwake)
-		{
-			_keepAwakeService.Disable();
-			return;
-		}
+    public void ApplySettings()
+    {
+        if (!Settings.KeepComputerAwake)
+        {
+            _keepAwakeService.Disable();
+            return;
+        }
 
-		if (Settings.KeepDisplayAwake)
-		{
-			_keepAwakeService.EnableSystemAndDisplayAwake();
-		}
-		else
-		{
-			_keepAwakeService.EnableSystemAwake();
-		}
-	}
+        if (Settings.KeepDisplayAwake)
+        {
+            _keepAwakeService.EnableSystemAndDisplayAwake();
+        }
+        else
+        {
+            _keepAwakeService.EnableSystemAwake();
+        }
+    }
+
+    public async Task SaveAsync()
+    {
+        await _settingsService.SaveAsync(Settings);
+    }
 }
