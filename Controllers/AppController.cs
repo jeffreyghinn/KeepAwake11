@@ -1,3 +1,4 @@
+using KeepAwake11.Services;
 using KeepAwake11.ViewModels;
 using Microsoft.UI.Xaml;
 
@@ -5,43 +6,33 @@ namespace KeepAwake11.Controllers;
 
 public class AppController
 {
-    private readonly MainViewModel _viewModel = new();
-    private Window? _window;
+	private readonly MainViewModel _viewModel = new();
 
-    public MainViewModel ViewModel => _viewModel;
+	private WindowService? _windowService;
 
-    public async Task InitializeAsync(Window window)
-    {
-        _window = window;
+	public MainViewModel ViewModel => _viewModel;
 
-        await _viewModel.InitializeAsync();
+	public async Task InitializeAsync(Window window)
+	{
+		_windowService = new WindowService(window);
 
-        ApplyStartupState();
-    }
+		await _viewModel.InitializeAsync();
 
-    private void ApplyStartupState()
-    {
-        if (!_viewModel.Settings.KeepComputerAwake)
-            return;
+		if (_viewModel.Settings.KeepComputerAwake)
+		{
+			_viewModel.ApplySettings();
+		}
+	}
 
-        _viewModel.ApplySettings();
-    }
+	public void ShowWindow()
+	{
+		_windowService?.Show();
+	}
 
-    public void ShowWindow()
-    {
-        if (_window is null) return;
+	public void HideWindow()
+	{
+		_windowService?.Hide();
+	}
 
-        _window.Activate();
-    }
-
-    public void HideWindow()
-    {
-        if (_window is null) return;
-
-        var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(_window);
-        var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
-        var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
-
-        appWindow.Hide();
-    }
+	public IntPtr WindowHandle => _windowService?.Handle ?? IntPtr.Zero;
 }
