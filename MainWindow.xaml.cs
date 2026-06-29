@@ -13,13 +13,14 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using KeepAwake11.Services;
+using KeepAwake11.ViewModels;
 
 namespace KeepAwake11;
 
 public sealed partial class MainWindow : Window
 {
 
-    private KeepAwakeService _keepAwake = new();
+    private  readonly MainViewModel _viewModel = new();
     public MainWindow()
     {
         this.InitializeComponent();
@@ -27,17 +28,12 @@ public sealed partial class MainWindow : Window
 
     private void KeepAwakeToggle_Toggled(object sender, RoutedEventArgs e)
     {
-        bool enabled = KeepAwakeToggle.IsOn;
+        _viewModel.Settings.KeepComputerAwake = KeepAwakeToggle.IsOn;
 
-        if (enabled)
-        {
-            _keepAwake.EnableSystemAwake();
-            StatusText.Text = "Keep Awake: ON";
-        }
-        else
-        {
-            _keepAwake.Disable();
-            StatusText.Text = "Keep Awake: OFF";
-        }
+        _viewModel.ApplySettings();
+
+        StatusText.Text = KeepAwakeToggle.IsOn
+            ? "Keep Awake: ON"
+            : "Keep Awake: OFF";
     }
 }
