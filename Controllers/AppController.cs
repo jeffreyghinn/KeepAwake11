@@ -1,3 +1,4 @@
+using System;
 using KeepAwake11.Services;
 using KeepAwake11.ViewModels;
 using Microsoft.UI.Xaml;
