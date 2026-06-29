@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace KeepAwake11.Services;
@@ -29,6 +30,31 @@ public class TrayService
 
 	private NOTIFYICONDATA _data;
 
+	[DllImport("user32.dll", CharSet = CharSet.Auto)]
+	private static extern IntPtr LoadImage(
+	IntPtr hInst,
+	string name,
+	uint type,
+	int cx,
+	int cy,
+	uint fuLoad);
+
+	private const uint IMAGE_ICON = 1;
+	private const uint LR_LOADFROMFILE = 0x0010;
+
+	private IntPtr LoadTrayIcon()
+	{
+		string path = Path.Combine(AppContext.BaseDirectory, "Assets", "tray.ico");
+
+		return LoadImage(
+			IntPtr.Zero,
+			path,
+			IMAGE_ICON,
+			16,
+			16,
+			LR_LOADFROMFILE);
+	}
+
 	public void Initialize(IntPtr windowHandle)
 	{
 		_data = new NOTIFYICONDATA
@@ -37,7 +63,7 @@ public class TrayService
 			hWnd = windowHandle,
 			uID = 1,
 			uFlags = NIF_ICON | NIF_TIP,
-			hIcon = IntPtr.Zero,
+			hIcon = LoadTrayIcon(),
 			szTip = "KeepAwake11"
 		};
 
