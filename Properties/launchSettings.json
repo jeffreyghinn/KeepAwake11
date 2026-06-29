@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "KeepAwake11 (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "KeepAwake11 (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
